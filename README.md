@@ -23,11 +23,11 @@ mtx-stats file1.mtx ... fileN.mtx
 With Nix:
 
 ```sh
-nix shell github:Guilloteau/mtx-stats 
+nix shell github:GuilloteauQ/mtx-stats 
 ```
 
 or
 
 ```sh
-nix run github:Guilloteau/mtx-stats  -- file1.mtx ... fileN.mtx
+nix run github:GuilloteauQ/mtx-stats  -- file1.mtx ... fileN.mtx
 ```
