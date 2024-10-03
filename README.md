@@ -18,6 +18,14 @@ Informations:
 mtx-stats file1.mtx ... fileN.mtx
 ```
 
+`mtx-stats` uses OpenMP to parallelize file processing.
+
+You can set the environment variable `OMP_NUM_THREADS` to control the number of threads to use:
+
+```sh
+OMP_NUM_THREADS=8 mtx-stats file1.mtx ... fileN.mtx
+```
+
 ## Install
 
 With Nix:
@@ -31,3 +39,4 @@ or
 ```sh
 nix run github:GuilloteauQ/mtx-stats  -- file1.mtx ... fileN.mtx
 ```
+
