@@ -2,9 +2,23 @@
 #include <stdlib.h>
 #include <math.h>
 #include <omp.h>
+#include <stdint.h>
 
-#define MMIO_IMPLEMENTATION
-#include "mmio.h"
+//#define MMIO_IMPLEMENTATION
+//#include "mmio.h"
+
+#define MAX_LINE_LENGTH 1024
+
+int mm_read_mtx_crd_size(FILE *f, int *M, int *N, int *nz ) {
+    char line[MAX_LINE_LENGTH];
+    *M = *N = *nz = 0;
+    do {
+        if (fgets(line, MAX_LINE_LENGTH, f) == NULL) 
+            return 1;
+    } while (line[0] == '%');
+
+    return sscanf(line, "%d %d %d", M, N, nz);
+}
 
 double compute_average_row_length(uint32_t* counts, int n) {
   double avg = 0.0;
@@ -26,10 +40,9 @@ double compute_cov_row_length(uint32_t* counts, int n, double avg) {
 }
 
 void get_stat_matrix(char* matrix_path) {
-  MM_typecode matcode;
   FILE *f;
   uint32_t x, y;
-  int ret_code, M, N, nz, i;   
+  int M, N, nz, i;   
   double val, average_row_length, cov_row_length;
 
   if ((f = fopen(matrix_path, "r")) == NULL) {
@@ -37,18 +50,7 @@ void get_stat_matrix(char* matrix_path) {
     exit(1);
   }
 
-  if (mm_read_banner(f, &matcode) != 0) {
-    fprintf(stderr, "`%s`: Could not process Matrix Market banner.\n", matrix_path);
-    exit(1);
-  }
-
-  if (mm_is_complex(matcode) && mm_is_matrix(matcode) && 
-      mm_is_sparse(matcode)) {
-    fprintf(stderr, "`%s`: Sorry, this application does not support\n\tMarket Market type: [%s]\n", matrix_path, mm_typecode_to_str(matcode));
-    exit(1);
-  }
-
-  if ((ret_code = mm_read_mtx_crd_size(f, &M, &N, &nz)) !=0)
+  if (mm_read_mtx_crd_size(f, &M, &N, &nz) != 3)
     exit(1);
 
   uint32_t* counts = (uint32_t*) calloc(M, sizeof(uint32_t)); 
